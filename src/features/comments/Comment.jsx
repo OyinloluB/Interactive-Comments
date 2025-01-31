@@ -4,11 +4,13 @@ import VotingControls from "./VotingControls";
 import { useState } from "react";
 import CommentForm from "./CommentForm";
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, replyingTo }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyUsername, setReplyUsername] = useState("");
 
   const handleReplyFormDisplay = () => {
-    setShowReplyForm(`@${comment.user}`);
+    setReplyUsername(`@${comment.user}`);
+    setShowReplyForm(true);
   };
 
   return (
@@ -34,22 +36,29 @@ const Comment = ({ comment }) => {
               </div>
             </div>
 
-            <p className="font-normal text-base text-secondary">
-              {comment.text}
-            </p>
+            <div>
+              <p className="font-normal text-base text-secondary">
+                {replyingTo && (
+                  <span className="mr-1 text-primary font-medium">
+                    @{replyingTo}
+                  </span>
+                )}
+                {comment.text}
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex justify-between items-center mt-6 sm:hidden">
           <VotingControls votes={12} />
-          <CommentActions />
+          <CommentActions onReply={handleReplyFormDisplay} />
         </div>
       </div>
       {showReplyForm && (
         <CommentForm
           onSubmit={() => console.log("Reply submitted")}
-          placeholder=""
+          placeholder={`Reply ${replyUsername}`}
           submitText="Reply"
-          username={showReplyForm}
+          username={replyUsername}
           className="mt-2"
         />
       )}
@@ -65,6 +74,7 @@ Comment.propTypes = {
     votes: PropTypes.number.isRequired,
     replies: PropTypes.array,
   }).isRequired,
+  replyingTo: PropTypes.string,
 };
 
 export default Comment;

@@ -1,7 +1,7 @@
 import Comments from "./features/comments/Comments";
 import "./index.css";
 
-const commentsData = [
+const initialComments = [
   {
     id: 1,
     user: "amyrobson",
@@ -18,13 +18,14 @@ const commentsData = [
       {
         id: 2,
         user: "ramsesmiron",
-        text: "@maxblagun If you’re still new, I’d recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It’s very tempting to jump ahead but lay a solid foundation first.",
+        text: "If you’re still new, I’d recommend focusing on the fundamentals of HTML, CSS, and JS before considering React. It’s very tempting to jump ahead but lay a solid foundation first.",
         votes: 4,
+        replies: [],
       },
       {
         id: 3,
         user: "juliosomo",
-        text: "@ramsesmiron I couldn’t agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
+        text: "I couldn’t agree more with this. Everything moves so fast and it always seems like everyone knows the newest library/framework. But the fundamentals are what stay constant.",
         votes: 2,
         replies: [],
       },
@@ -33,7 +34,7 @@ const commentsData = [
 ];
 
 function App() {
-  return <Comments comments={commentsData} />;
+  return <Comments comments={initialComments} />;
 }
 
 export default App;
