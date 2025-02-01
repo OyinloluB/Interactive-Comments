@@ -57,6 +57,22 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
     const commentId = Number(req.params.id);
 
+    // check if the comment has replies
+    const existingComment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      include: { replies: true },
+    });
+
+    if (!existingComment) {
+      res.status(404).json({ error: "Comment not found" });
+    }
+
+    if (existingComment && existingComment.replies.length > 0) {
+      res
+        .status(400)
+        .json({ error: "You cannot edit a comment that has replies" });
+    }
+
     // validate only the `text` field
     const validatedData = z
       .object({
