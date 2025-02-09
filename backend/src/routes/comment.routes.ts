@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 const commentSchema = z.object({
   user: z.string().min(1, "User is required"),
   text: z.string().min(1, "Comment text is required"),
-  parentId: z.number().optional(),
+  parentId: z.number().nullable(),
 });
 
 // add a new comment
@@ -34,16 +34,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
 router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
     const comments = await prisma.comment.findMany({
-      where: {
-        parentId: null,
-      },
-      include: {
-        replies: {
-          include: {
-            replies: true,
-          },
-        },
-      },
+      orderBy: { createdAt: "asc" },
     });
 
     res.json(comments);
@@ -60,14 +51,17 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
     // check if the comment has replies
     const existingComment = await prisma.comment.findUnique({
       where: { id: commentId },
-      include: { replies: true },
     });
 
     if (!existingComment) {
       res.status(404).json({ error: "Comment not found" });
     }
 
-    if (existingComment && existingComment.replies.length > 0) {
+    const hasReplies = await prisma.comment.findFirst({
+      where: { parentId: commentId },
+    });
+
+    if (hasReplies) {
       res
         .status(400)
         .json({ error: "You cannot edit a comment that has replies" });

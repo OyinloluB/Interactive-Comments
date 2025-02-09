@@ -1,11 +1,42 @@
+import axios from "axios";
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-const CommentForm = ({ onSubmit, placeholder, submitText, className }) => {
+const CommentForm = ({
+  placeholder,
+  submitText,
+  className,
+  parentId,
+  onCommentAdded,
+}) => {
   const [commentText, setCommentText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setCommentText(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!commentText.trim()) return;
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post("http://localhost:5001/api/comment", {
+        user: "John Doe",
+        text: commentText,
+        parentId: parentId || null,
+      });
+
+      onCommentAdded(response.data);
+      setCommentText("");
+    } catch (error) {
+      console.error("Failed to submit comment:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,19 +55,21 @@ const CommentForm = ({ onSubmit, placeholder, submitText, className }) => {
       </div>
 
       <button
-        onClick={() => onSubmit(commentText)}
-        className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] uppercase hover:bg-primary-dark transition hidden md:flex"
+        disabled={loading}
+        onClick={handleSubmit}
+        className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-dark transition hidden md:flex"
       >
-        {submitText}
+        {loading ? "Sending..." : submitText}
       </button>
 
       <div className="flex justify-between items-center w-full sm:hidden">
         <div className="min-w-[32px] min-h-[32px] rounded-full border border-secondary bg-background" />
         <button
-          onClick={() => onSubmit(commentText)}
-          className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] uppercase hover:bg-primary-dark transition"
+          disabled={loading}
+          onClick={handleSubmit}
+          className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-dark transition"
         >
-          {submitText}
+          {loading ? "Sending..." : submitText}
         </button>
       </div>
     </div>
@@ -44,16 +77,18 @@ const CommentForm = ({ onSubmit, placeholder, submitText, className }) => {
 };
 
 CommentForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   submitText: PropTypes.string,
   className: PropTypes.string,
+  parentId: PropTypes.number,
+  onCommentAdded: PropTypes.func.isRequired,
 };
 
 CommentForm.defaultProps = {
   placeholder: "Add a comment...",
   submitText: "Send",
   className: "",
+  parentId: null,
 };
 
 export default CommentForm;
