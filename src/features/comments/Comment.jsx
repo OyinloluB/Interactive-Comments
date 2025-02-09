@@ -76,7 +76,7 @@ const Comment = ({ comment }) => {
       <div className={`w-full p-6 rounded-lg bg-comment`}>
         <div className="flex md:flex-row gap-6">
           <div className="hidden md:flex">
-            <VotingControls votes={comment.votes} />
+            <VotingControls votes={comment.votes} commentId={comment.id} />
           </div>
 
           <div className="flex flex-col gap-4 w-full">
@@ -142,7 +142,7 @@ const Comment = ({ comment }) => {
           </div>
         </div>
         <div className="flex justify-between items-center mt-6 sm:hidden">
-          <VotingControls votes={12} />
+          <VotingControls votes={comment.votes} commentId={comment.id} />
           <CommentActions
             onReply={handleReplyFormToggle}
             isOwnComment={isOwnComment}

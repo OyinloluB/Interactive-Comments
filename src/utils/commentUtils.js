@@ -39,17 +39,18 @@ export const findParentComment = (comments, parentId) => {
   return null;
 };
 
-export const updateNestedComment = (comments, commentId, newText) => {
+export const updateNestedComment = (comments, commentId, newText, newVotes) => {
   return comments.map((comment) => {
     if (comment.id === commentId) {
-      return { ...comment, text: newText };
+      return { ...comment, text: newText, votes: newVotes };
     }
 
     if (comment.replies?.length > 0) {
       const updatedReplies = updateNestedComment(
         comment.replies,
         commentId,
-        newText
+        newText,
+        newVotes
       );
       return { ...comment, replies: updatedReplies };
     }

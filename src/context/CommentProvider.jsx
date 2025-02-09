@@ -37,8 +37,10 @@ export const CommentProvider = ({ children }) => {
     });
   };
 
-  const handleEditSuccess = (commentId, newText) => {
-    setComments((prev) => updateNestedComment(prev, commentId, newText));
+  const handleEditSuccess = (commentId, newText, newVotes) => {
+    setComments((prev) =>
+      updateNestedComment(prev, commentId, newText, newVotes)
+    );
   };
 
   const handleDeleteSuccess = (commentId) => {

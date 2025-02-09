@@ -14,6 +14,11 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // routes
 app.use("/api/comment", commentsRouter);
 

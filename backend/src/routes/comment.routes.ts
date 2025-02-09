@@ -43,6 +43,36 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// upvote a comment
+router.patch("/:id/upvote", async (req: Request, res: Response) => {
+  const commentId = Number(req.params.id);
+
+  try {
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: { votes: { increment: 1 } },
+    });
+    res.json(updatedComment);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to upvote the comment." });
+  }
+});
+
+// downvote a comment
+router.patch("/:id/downvote", async (req: Request, res: Response) => {
+  const commentId = Number(req.params.id);
+
+  try {
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: { votes: { decrement: 1 } },
+    });
+    res.json(updatedComment);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to downvote the comment." });
+  }
+});
+
 // edit a comment
 router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
