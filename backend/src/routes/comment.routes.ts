@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
+import { analyzeComment } from "../utils/sentimentAnalysis";
+
 const router = express.Router();
 const prisma = new PrismaClient();
 
@@ -12,21 +14,36 @@ const commentSchema = z.object({
   parentId: z.number().nullable(),
 });
 
-// add a new comment
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+// set a toxicity threshold ( block comments above 0.8 toxicity)
+const TOXICITY_THRESHOLD = 0.8;
+
+// add a new comment with sentiment analysis
+router.post("/", async (req: Request, res: Response): Promise<any> => {
   try {
     const validatedData = commentSchema.parse(req.body);
 
+    // analyze the comment text
+    const toxicityScore = await analyzeComment(validatedData.text);
+
+    if (toxicityScore > TOXICITY_THRESHOLD) {
+      return res.status(400).json({
+        error:
+          "Your comment was flagged as potentially harmful. Please revise it.",
+      });
+    }
+
+    // if not toxic, save the comment
     const newComment = await prisma.comment.create({
       data: validatedData,
     });
 
-    res.status(201).json(newComment);
+    return res.status(201).json(newComment);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      res.status(400).json({ errors: error.errors });
+      return res.status(400).json({ errors: error.errors });
+    } else {
+      return res.status(500).json({ error: "Internal Server Error" });
     }
-    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -74,7 +91,7 @@ router.patch("/:id/downvote", async (req: Request, res: Response) => {
 });
 
 // edit a comment
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", async (req: Request, res: Response): Promise<any> => {
   try {
     const commentId = Number(req.params.id);
 
@@ -103,6 +120,15 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
         text: z.string().min(1, "Comment text is required"),
       })
       .parse(req.body);
+
+    const toxicityScore = await analyzeComment(req.body);
+
+    if (toxicityScore > TOXICITY_THRESHOLD) {
+      return res.status(400).json({
+        error:
+          "Your comment was flagged as potentially harmful. Please revise it.",
+      });
+    }
 
     const updatedComment = await prisma.comment.update({
       where: {
