@@ -110,7 +110,7 @@ const Comment = ({ comment }) => {
                   <textarea
                     value={editedText}
                     onChange={(e) => setEditedText(e.target.value)}
-                    className="w-full p-3 border border-border rounded-md focus:outline-primary"
+                    className="w-full p-3 border border-border rounded-md outline-1 focus:outline-primary caret-primary"
                     rows={3}
                   />
                   <div className="flex justify-end gap-4">

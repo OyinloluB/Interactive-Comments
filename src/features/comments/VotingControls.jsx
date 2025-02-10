@@ -27,12 +27,18 @@ const VotingControls = ({ votes, commentId }) => {
 
   return (
     <div className="flex sm:flex-col flex-row items-center justify-between p-3 min-w-[120px] sm:min-w-[50px] max-h-[100px] sm:min-h-[100px] rounded-xl bg-background">
-      <div onClick={() => handleVote("upvote")}>
-        <UpVoteIcon className="cursor-pointer" />
+      <div
+        onClick={() => handleVote("upvote")}
+        className="text-primary-hover hover:text-primary cursor-pointer"
+      >
+        <UpVoteIcon />
       </div>
       <p className="font-medium text-primary m-0">{currentVotes}</p>
-      <div onClick={() => handleVote("downvote")}>
-        <DownVoteIcon className="cursor-pointer" />
+      <div
+        onClick={() => handleVote("downvote")}
+        className="text-primary-hover hover:text-primary cursor-pointer"
+      >
+        <DownVoteIcon />
       </div>
     </div>
   );

@@ -16,6 +16,8 @@
 
   /* Interactive */
   --color-danger: #ed6368;
+  --color-primary-hover: #c5c6ef;
+  --color-danger-hover: #ffb8bb;
 }
 
 @layer base {

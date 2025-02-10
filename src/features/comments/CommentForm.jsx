@@ -50,14 +50,14 @@ const CommentForm = ({
           value={commentText}
           onChange={handleChange}
           placeholder={placeholder}
-          className="w-full min-h-[96px] p-4 border border-border focus:outline-0 placeholder:text-secondary placeholder:text-base rounded-md"
+          className="w-full min-h-[96px] p-4 border border-border focus:outline-1 focus:outline-primary placeholder:text-secondary placeholder:text-base rounded-md caret-primary"
         />
       </div>
 
       <button
         disabled={loading}
         onClick={handleSubmit}
-        className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-dark transition hidden md:flex"
+        className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-hover transition hidden md:flex"
       >
         {loading ? "Sending..." : submitText}
       </button>
@@ -67,7 +67,7 @@ const CommentForm = ({
         <button
           disabled={loading}
           onClick={handleSubmit}
-          className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-dark transition"
+          className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-hover transition"
         >
           {loading ? "Sending..." : submitText}
         </button>

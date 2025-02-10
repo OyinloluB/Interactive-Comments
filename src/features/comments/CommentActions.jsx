@@ -3,7 +3,13 @@ import { ReplyCommentIcon } from "../../components/icons/ReplyCommentIcon";
 import { EditIcon } from "../../components/icons/EditIcon";
 import { DeleteIcon } from "../../components/icons/DeleteIcon";
 
-const CommentActions = ({ onReply, hasReplies, isOwnComment, onDelete, onEdit }) => {
+const CommentActions = ({
+  onReply,
+  hasReplies,
+  isOwnComment,
+  onDelete,
+  onEdit,
+}) => {
   return (
     <div>
       {isOwnComment ? (
@@ -11,7 +17,7 @@ const CommentActions = ({ onReply, hasReplies, isOwnComment, onDelete, onEdit })
           {!hasReplies && (
             <div
               onClick={onDelete}
-              className="flex items-center gap-2 cursor-pointer text-danger"
+              className="flex items-center gap-2 cursor-pointer text-danger group hover:text-danger-hover"
             >
               <DeleteIcon />
               <span>Delete</span>
@@ -19,7 +25,7 @@ const CommentActions = ({ onReply, hasReplies, isOwnComment, onDelete, onEdit })
           )}
           <div
             onClick={onEdit}
-            className="flex items-center gap-2 cursor-pointer text-primary"
+            className="flex items-center gap-2 cursor-pointer text-primary hover:text-primary-hover"
           >
             <EditIcon />
             <span>Edit</span>
@@ -27,7 +33,7 @@ const CommentActions = ({ onReply, hasReplies, isOwnComment, onDelete, onEdit })
         </div>
       ) : (
         <div
-          className="flex items-center gap-2 font-medium text-base text-primary cursor-pointer"
+          className="flex items-center gap-2 font-medium text-base text-primary hover:text-primary-hover cursor-pointer"
           onClick={onReply}
         >
           <ReplyCommentIcon />
