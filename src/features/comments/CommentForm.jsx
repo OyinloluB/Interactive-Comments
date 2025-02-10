@@ -11,9 +11,11 @@ const CommentForm = ({
 }) => {
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setCommentText(e.target.value);
+    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -23,6 +25,7 @@ const CommentForm = ({
 
     try {
       setLoading(true);
+      setError("");
 
       const response = await axios.post("http://localhost:5001/api/comment", {
         user: "John Doe",
@@ -33,7 +36,11 @@ const CommentForm = ({
       onCommentAdded(response.data);
       setCommentText("");
     } catch (error) {
-      console.error("Failed to submit comment:", error);
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -52,6 +59,7 @@ const CommentForm = ({
           placeholder={placeholder}
           className="w-full min-h-[96px] p-4 border border-border focus:outline-1 focus:outline-primary placeholder:text-secondary placeholder:text-base rounded-md caret-primary"
         />
+        {error && <p className="mt-2 text-danger text-sm">{error}</p>}
       </div>
 
       <button

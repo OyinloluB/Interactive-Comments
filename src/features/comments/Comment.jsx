@@ -21,6 +21,7 @@ const Comment = ({ comment }) => {
   const [replyUsername, setReplyUsername] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(comment.text);
+  const [error, setError] = useState("");
 
   const isOwnComment = comment.user === currentUser;
   const parentComment = comment.parentId
@@ -42,6 +43,7 @@ const Comment = ({ comment }) => {
     if (!editedText.trim()) return;
 
     try {
+      setError("");
       const response = await axios.put(
         `http://localhost:5001/api/comment/${comment.id}`,
         { text: editedText }
@@ -52,7 +54,11 @@ const Comment = ({ comment }) => {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error("Failed to edit comment:", error);
+      if (error.response.data.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -113,6 +119,8 @@ const Comment = ({ comment }) => {
                     className="w-full p-3 border border-border rounded-md outline-1 focus:outline-primary caret-primary"
                     rows={3}
                   />
+                  {error && <p className="mt-2 text-danger text-sm">{error}</p>}
+
                   <div className="flex justify-end gap-4">
                     <button
                       onClick={handleEditComment}
