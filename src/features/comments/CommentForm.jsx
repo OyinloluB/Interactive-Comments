@@ -1,6 +1,6 @@
-import axios from "axios";
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { useComments } from "../../hooks/useComments";
 
 const CommentForm = ({
   placeholder,
@@ -10,12 +10,10 @@ const CommentForm = ({
   onCommentAdded,
 }) => {
   const [commentText, setCommentText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { loading } = useComments();
 
   const handleChange = (e) => {
     setCommentText(e.target.value);
-    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -23,27 +21,8 @@ const CommentForm = ({
 
     if (!commentText.trim()) return;
 
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await axios.post("http://localhost:5001/api/comment", {
-        user: "John Doe",
-        text: commentText,
-        parentId: parentId || null,
-      });
-
-      onCommentAdded(response.data);
-      setCommentText("");
-    } catch (error) {
-      if (error.response.data.error) {
-        setError(error.response.data.error);
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    onCommentAdded({ user: "John Doe", text: commentText, parentId });
+    setCommentText("");
   };
 
   return (
@@ -59,7 +38,6 @@ const CommentForm = ({
           placeholder={placeholder}
           className="w-full min-h-[96px] p-4 border border-border focus:outline-1 focus:outline-primary placeholder:text-secondary placeholder:text-base rounded-md caret-primary"
         />
-        {error && <p className="mt-2 text-danger text-sm">{error}</p>}
       </div>
 
       <button

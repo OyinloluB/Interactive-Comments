@@ -4,77 +4,66 @@ import { formatDistanceToNow } from "date-fns";
 import CommentActions from "./CommentActions";
 import VotingControls from "./VotingControls";
 import CommentForm from "./CommentForm";
-import axios from "axios";
 import { useComments } from "../../hooks/useComments";
 import { findParentComment } from "../../utils/commentUtils";
+import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
 
 const Comment = ({ comment }) => {
   const {
+    loading,
+    comments,
+    currentUser,
     handleReplyAdded,
     handleEditSuccess,
     handleDeleteSuccess,
-    currentUser,
-    comments,
   } = useComments();
 
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyUsername, setReplyUsername] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(comment.text);
-  const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const isOwnComment = comment.user === currentUser;
   const parentComment = comment.parentId
     ? findParentComment(comments, comment.parentId)
     : null;
 
-  const handleReplyFormToggle = () => {
+  const toggleReplyForm = () => {
     setReplyUsername(`@${comment.user}`);
     setShowReplyForm(true);
   };
 
+  const startEditing = () => setIsEditing(true);
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setEditedText(comment.text);
+  };
+
   const handleReplySubmit = (newReply) => {
-    console.log("clicked");
     handleReplyAdded(comment.id, newReply);
     setShowReplyForm(false);
   };
 
   const handleEditComment = async () => {
-    if (!editedText.trim()) return;
-
-    try {
-      setError("");
-      const response = await axios.put(
-        `http://localhost:5001/api/comment/${comment.id}`,
-        { text: editedText }
-      );
-
-      if (response.status === 200) {
-        handleEditSuccess(comment.id, response.data.text);
-        setIsEditing(false);
-      }
-    } catch (error) {
-      if (error.response.data.error) {
-        setError(error.response.data.error);
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
+    if (editedText.trim()) {
+      handleEditSuccess(comment.id, editedText);
+      setIsEditing(false);
     }
   };
 
-  const handleDeleteComment = async () => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:5001/api/comment/${comment.id}`
-      );
+  const handleDeleteComment = () => {
+    setShowDeleteModal(true);
+  };
 
-      if (response.status === 200) {
-        handleDeleteSuccess(comment.id);
-      }
-    } catch (error) {
-      console.error("Failed to delete comment:", error);
-      alert(error.response?.data?.error || "Failed to delete comment");
-    }
+  const confirmDelete = () => {
+    handleDeleteSuccess(comment.id);
+    setShowDeleteModal(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   return (
@@ -101,11 +90,11 @@ const Comment = ({ comment }) => {
 
               <div className="hidden sm:flex">
                 <CommentActions
-                  onReply={handleReplyFormToggle}
+                  onReply={toggleReplyForm}
                   isOwnComment={isOwnComment}
                   hasReplies={comment.replies?.length > 0}
                   onDelete={handleDeleteComment}
-                  onEdit={() => setIsEditing(true)}
+                  onEdit={startEditing}
                 />
               </div>
             </div>
@@ -118,18 +107,20 @@ const Comment = ({ comment }) => {
                     onChange={(e) => setEditedText(e.target.value)}
                     className="w-full p-3 border border-border rounded-md outline-1 focus:outline-primary caret-primary"
                     rows={3}
+                    disabled={loading}
                   />
-                  {error && <p className="mt-2 text-danger text-sm">{error}</p>}
 
                   <div className="flex justify-end gap-4">
                     <button
                       onClick={handleEditComment}
+                      disabled={loading}
                       className="bg-primary text-white px-4 py-2 rounded-md cursor-pointer"
                     >
-                      Update
+                      {loading ? "Updating..." : "Update"}
                     </button>
                     <button
-                      onClick={() => setIsEditing(false)}
+                      onClick={cancelEditing}
+                      disabled={loading}
                       className="bg-gray-400 text-white px-4 py-2 rounded-md cursor-pointer"
                     >
                       Cancel
@@ -152,11 +143,11 @@ const Comment = ({ comment }) => {
         <div className="flex justify-between items-center mt-6 sm:hidden">
           <VotingControls votes={comment.votes} commentId={comment.id} />
           <CommentActions
-            onReply={handleReplyFormToggle}
+            onReply={toggleReplyForm}
             isOwnComment={isOwnComment}
             hasReplies={comment.replies?.length > 0}
             onDelete={handleDeleteComment}
-            onEdit={() => setIsEditing(true)}
+            onEdit={startEditing}
           />
         </div>
       </div>
@@ -164,7 +155,7 @@ const Comment = ({ comment }) => {
         <CommentForm
           onCommentAdded={handleReplySubmit}
           placeholder={`Reply ${replyUsername}`}
-          submitText="Reply"
+          submitText={loading ? "Replying..." : "Reply"}
           username={replyUsername}
           parentId={comment.id}
           className="mt-2"
@@ -178,6 +169,12 @@ const Comment = ({ comment }) => {
           ))}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </>
   );
 };

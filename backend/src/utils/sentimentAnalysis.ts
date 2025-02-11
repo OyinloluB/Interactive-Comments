@@ -36,6 +36,7 @@ export const analyzeComment = async (commentText: string): Promise<number> => {
     const analyzeRequest = {
       comment: { text: commentText },
       requestedAttributes: { TOXICITY: {} },
+      languages: ["en"],
     };
 
     // call Perspective API

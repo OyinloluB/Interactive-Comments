@@ -1,19 +1,26 @@
+import ErrorModal from "../../components/modal/ErrorModal";
 import { useComments } from "../../hooks/useComments";
 import Comment from "./Comment";
 import CommentForm from "./CommentForm";
 
 const Comments = () => {
-  const { comments, handleCommentAdded } = useComments();
+  const { error, resetError, loading, comments, handleCommentAdded } =
+    useComments();
 
   return (
     <div className="flex justify-center min-h-screen sm:py-16 px-5 py-10 font-rubik bg-background">
       <div className="sm:min-w-[730px] space-y-6">
+        {loading && (
+          <p className="text-center text-secondary">Loading comments...</p>
+        )}
         {comments.map((comment) => (
           <Comment key={comment.id} comment={comment} />
         ))}
 
         <CommentForm onCommentAdded={handleCommentAdded} />
       </div>
+
+      <ErrorModal isOpen={!!error} message={error} onClose={resetError} />
     </div>
   );
 };

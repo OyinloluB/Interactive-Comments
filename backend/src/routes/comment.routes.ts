@@ -135,7 +135,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<any> => {
       })
       .parse(req.body);
 
-    const toxicityScore = await analyzeComment(req.body);
+    const toxicityScore = await analyzeComment(validatedData.text);
 
     if (toxicityScore > TOXICITY_THRESHOLD) {
       return res.status(400).json({
