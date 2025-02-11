@@ -10,6 +10,10 @@ const VotingControls = ({ votes, commentId }) => {
   const [currentVotes, setCurrentVotes] = useState(votes);
 
   const handleVote = async (type) => {
+    if (type === "downvote" && currentVotes === 0) {
+      return;
+    }
+
     try {
       const response = await axios.patch(
         `http://localhost:5001/api/comment/${commentId}/${type}`

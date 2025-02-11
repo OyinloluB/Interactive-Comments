@@ -76,19 +76,33 @@ router.patch("/:id/upvote", async (req: Request, res: Response) => {
 });
 
 // downvote a comment
-router.patch("/:id/downvote", async (req: Request, res: Response) => {
-  const commentId = Number(req.params.id);
+router.patch(
+  "/:id/downvote",
+  async (req: Request, res: Response): Promise<any> => {
+    const commentId = Number(req.params.id);
 
-  try {
-    const updatedComment = await prisma.comment.update({
-      where: { id: commentId },
-      data: { votes: { decrement: 1 } },
-    });
-    res.json(updatedComment);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to downvote the comment." });
+    try {
+      const comment = await prisma.comment.findUnique({
+        where: { id: commentId },
+      });
+
+      if (!comment) {
+        return res.status(404).json({ error: "Comment not found." });
+      }
+
+      const updatedVotes = Math.max(comment.votes - 1, 0);
+
+      const updatedComment = await prisma.comment.update({
+        where: { id: commentId },
+        data: { votes: updatedVotes },
+      });
+
+      res.json(updatedComment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to downvote the comment." });
+    }
   }
-});
+);
 
 // edit a comment
 router.put("/:id", async (req: Request, res: Response): Promise<any> => {
