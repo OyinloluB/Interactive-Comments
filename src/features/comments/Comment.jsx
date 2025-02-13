@@ -6,7 +6,7 @@ import VotingControls from "./VotingControls";
 import CommentForm from "./CommentForm";
 import { useComments } from "../../hooks/useComments";
 import { findParentComment } from "../../utils/commentUtils";
-import DeleteConfirmationModal from "../../components/modal/DeleteConfirmationModal";
+import DeleteConfirmationModal from "../../components/overlay/DeleteConfirmationModal";
 
 const Comment = ({ comment }) => {
   const {
