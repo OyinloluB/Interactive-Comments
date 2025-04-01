@@ -89,7 +89,9 @@ export const CommentProvider = ({ children }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/comment");
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/comment`
+        );
         dispatch({
           type: "FETCH_SUCCESS",
           payload: organizeComments(response.data),
@@ -108,7 +110,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/comment",
+        `${import.meta.env.VITE_API_BASE_URL}/api/comment`,
         newComment
       );
       dispatch({ type: "ADD_COMMENT_SUCCESS" });
@@ -124,7 +126,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/comment",
+        `${import.meta.env.VITE_API_BASE_URL}/api/comment`,
         newReply
       );
       dispatch({ type: "ADD_REPLY_SUCCESS" });
@@ -143,7 +145,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/comment/${commentId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}`,
         {
           text: newText,
         }
@@ -171,7 +173,9 @@ export const CommentProvider = ({ children }) => {
     dispatch({ type: "DELETE_COMMENT_START" });
 
     try {
-      await axios.delete(`http://localhost:5001/api/comment/${commentId}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}`
+      );
       dispatch({ type: "DELETE_COMMENT_SUCCESS" });
       dispatch({ type: "DELETE_COMMENT", commentId });
     } catch (error) {

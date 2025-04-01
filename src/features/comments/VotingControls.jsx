@@ -16,7 +16,7 @@ const VotingControls = ({ votes, commentId }) => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:5001/api/comment/${commentId}/${type}`
+        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}/${type}`
       );
 
       if (response.status === 200) {
