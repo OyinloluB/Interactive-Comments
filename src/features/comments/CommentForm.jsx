@@ -10,9 +10,15 @@ const CommentForm = ({
   onCommentAdded,
 }) => {
   const [commentText, setCommentText] = useState("");
-  const { loading } = useComments();
+  const { loading, error, resetError } = useComments();
+  const isReply = parentId !== null;
+  const isSubmitting = isReply ? loading.reply : loading.add;
+  const formError = isReply ? error.reply : error.add;
+
+  console.log(error);
 
   const handleChange = (e) => {
+    if (formError) resetError();
     setCommentText(e.target.value);
   };
 
@@ -38,24 +44,25 @@ const CommentForm = ({
           placeholder={placeholder}
           className="w-full min-h-[96px] p-4 border border-border focus:outline-1 focus:outline-primary placeholder:text-secondary placeholder:text-base rounded-md caret-primary"
         />
+        {formError && <p className="text-sm text-danger mt-2">{formError}</p>}
       </div>
 
       <button
-        disabled={loading}
+        disabled={isSubmitting}
         onClick={handleSubmit}
         className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-hover transition hidden md:flex"
       >
-        {loading ? "Sending..." : submitText}
+        {isSubmitting ? "Sending..." : submitText}
       </button>
 
       <div className="flex justify-between items-center w-full sm:hidden">
         <div className="min-w-[32px] min-h-[32px] rounded-full border border-secondary bg-background" />
         <button
-          disabled={loading}
+          disabled={isSubmitting}
           onClick={handleSubmit}
           className="bg-primary text-comment text-base rounded-md px-[30px] py-[12px] cursor-pointer uppercase hover:bg-primary-hover transition"
         >
-          {loading ? "Sending..." : submitText}
+          {isSubmitting ? "Sending..." : submitText}
         </button>
       </div>
     </div>

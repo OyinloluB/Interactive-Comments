@@ -10,9 +10,11 @@ import DeleteConfirmationModal from "../../components/overlay/DeleteConfirmation
 
 const Comment = ({ comment }) => {
   const {
+    error,
     loading,
     comments,
     currentUser,
+    resetError,
     handleReplyAdded,
     handleEditSuccess,
     handleDeleteSuccess,
@@ -39,6 +41,7 @@ const Comment = ({ comment }) => {
   const cancelEditing = () => {
     setIsEditing(false);
     setEditedText(comment.text);
+    resetError();
   };
 
   const handleReplySubmit = (newReply) => {
@@ -47,8 +50,11 @@ const Comment = ({ comment }) => {
   };
 
   const handleEditComment = async () => {
-    if (editedText.trim()) {
-      handleEditSuccess(comment.id, editedText);
+    if (!editedText.trim()) return;
+
+    const success = await handleEditSuccess(comment.id, editedText);
+
+    if (success) {
       setIsEditing(false);
     }
   };
@@ -104,23 +110,30 @@ const Comment = ({ comment }) => {
                 <div className="flex flex-col gap-2">
                   <textarea
                     value={editedText}
-                    onChange={(e) => setEditedText(e.target.value)}
+                    onChange={(e) => {
+                      if (error.edit) resetError();
+                      setEditedText(e.target.value);
+                    }}
                     className="w-full p-3 border border-border rounded-md outline-1 focus:outline-primary caret-primary"
                     rows={3}
-                    disabled={loading}
+                    disabled={loading.edit}
                   />
+
+                  {error.edit && (
+                    <p className="text-sm text-danger mt-2">{error.edit}</p>
+                  )}
 
                   <div className="flex justify-end gap-4">
                     <button
                       onClick={handleEditComment}
-                      disabled={loading}
+                      disabled={loading.edit}
                       className="bg-primary text-white px-4 py-2 rounded-md cursor-pointer"
                     >
-                      {loading ? "Updating..." : "Update"}
+                      {loading.edit ? "Updating..." : "Update"}
                     </button>
                     <button
                       onClick={cancelEditing}
-                      disabled={loading}
+                      disabled={loading.edit}
                       className="bg-gray-400 text-white px-4 py-2 rounded-md cursor-pointer"
                     >
                       Cancel
@@ -155,7 +168,7 @@ const Comment = ({ comment }) => {
         <CommentForm
           onCommentAdded={handleReplySubmit}
           placeholder={`Reply ${replyUsername}`}
-          submitText={loading ? "Replying..." : "Reply"}
+          submitText={loading.reply ? "Replying..." : "Reply"}
           username={replyUsername}
           parentId={comment.id}
           className="mt-2"

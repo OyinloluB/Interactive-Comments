@@ -10,7 +10,7 @@ const Comments = () => {
 
   return (
     <div className="flex justify-center min-h-screen sm:py-16 px-5 py-10 font-rubik bg-background">
-      {loading && <SpinnerOverlay />}
+      {loading.fetch && <SpinnerOverlay />}
       <div className="sm:min-w-[730px] space-y-6">
         {comments.map((comment) => (
           <Comment key={comment.id} comment={comment} />
@@ -18,7 +18,11 @@ const Comments = () => {
 
         <CommentForm onCommentAdded={handleCommentAdded} />
       </div>
-      <ErrorModal isOpen={!!error} message={error} onClose={resetError} />
+      <ErrorModal
+        isOpen={!!error.fetch}
+        message={error.fetch}
+        onClose={resetError}
+      />
     </div>
   );
 };

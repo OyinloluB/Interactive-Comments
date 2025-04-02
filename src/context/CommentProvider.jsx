@@ -12,45 +12,83 @@ import getApiBaseUrl from "../utils/apiBaseUrl";
 
 const initialState = {
   comments: [],
-  error: null,
-  loading: true,
+  error: {
+    fetch: null,
+    add: null,
+    reply: null,
+    edit: null,
+    delete: null,
+  },
+  loading: {
+    fetch: false,
+    add: false,
+    reply: false,
+    edit: false,
+    delete: false,
+  },
 };
 
 const commentReducer = (state, action) => {
   switch (action.type) {
+    case "FETCH_START":
+      return {
+        ...state,
+        loading: { ...state.loading, fetch: true },
+        error: { ...state.error, fetch: null },
+      };
     case "FETCH_SUCCESS":
-      return { ...state, comments: action.payload, loading: false };
-
+      return {
+        ...state,
+        comments: action.payload,
+        loading: { ...state.loading, fetch: false },
+      };
     case "FETCH_ERROR":
-      return { ...state, error: action.payload, loading: false };
-
-    case "RESET_ERROR":
-      return { ...state, error: null };
+      return {
+        ...state,
+        loading: { ...state.loading, fetch: false },
+        error: { ...state.error, fetch: action.payload },
+      };
 
     case "ADD_COMMENT_START":
-    case "EDIT_COMMENT_START":
-    case "DELETE_COMMENT_START":
-    case "ADD_REPLY_START":
-      return { ...state, loading: true, error: null };
-
+      return {
+        ...state,
+        loading: { ...state.loading, add: true },
+        error: { ...state.error, add: null },
+      };
     case "ADD_COMMENT_SUCCESS":
-    case "EDIT_COMMENT_SUCCESS":
-    case "DELETE_COMMENT_SUCCESS":
-    case "ADD_REPLY_SUCCESS":
-      return { ...state, loading: false };
-
+      return {
+        ...state,
+        loading: { ...state.loading, add: false },
+      };
     case "ADD_COMMENT_ERROR":
-    case "EDIT_COMMENT_ERROR":
-    case "DELETE_COMMENT_ERROR":
-    case "ADD_REPLY_ERROR":
-      return { ...state, loading: false, error: action.payload };
-
+      return {
+        ...state,
+        loading: { ...state.loading, add: false },
+        error: { ...state.error, add: action.payload },
+      };
     case "ADD_COMMENT":
       return {
         ...state,
         comments: [...state.comments, { ...action.payload, replies: [] }],
       };
 
+    case "ADD_REPLY_START":
+      return {
+        ...state,
+        loading: { ...state.loading, reply: true },
+        error: { ...state.error, reply: null },
+      };
+    case "ADD_REPLY_SUCCESS":
+      return {
+        ...state,
+        loading: { ...state.loading, reply: false },
+      };
+    case "ADD_REPLY_ERROR":
+      return {
+        ...state,
+        loading: { ...state.loading, reply: false },
+        error: { ...state.error, reply: action.payload },
+      };
     case "ADD_REPLY":
       return {
         ...state,
@@ -61,6 +99,23 @@ const commentReducer = (state, action) => {
         ),
       };
 
+    case "EDIT_COMMENT_START":
+      return {
+        ...state,
+        loading: { ...state.loading, edit: true },
+        error: { ...state.error, edit: null },
+      };
+    case "EDIT_COMMENT_SUCCESS":
+      return {
+        ...state,
+        loading: { ...state.loading, edit: false },
+      };
+    case "EDIT_COMMENT_ERROR":
+      return {
+        ...state,
+        loading: { ...state.loading, edit: false },
+        error: { ...state.error, edit: action.payload },
+      };
     case "EDIT_COMMENT":
       return {
         ...state,
@@ -72,10 +127,39 @@ const commentReducer = (state, action) => {
         ),
       };
 
+    case "DELETE_COMMENT_START":
+      return {
+        ...state,
+        loading: { ...state.loading, delete: true },
+        error: { ...state.error, delete: null },
+      };
+    case "DELETE_COMMENT_SUCCESS":
+      return {
+        ...state,
+        loading: { ...state.loading, delete: false },
+      };
+    case "DELETE_COMMENT_ERROR":
+      return {
+        ...state,
+        loading: { ...state.loading, delete: false },
+        error: { ...state.error, delete: action.payload },
+      };
     case "DELETE_COMMENT":
       return {
         ...state,
         comments: deleteNestedComment(state.comments, action.commentId),
+      };
+
+    case "RESET_ERROR":
+      return {
+        ...state,
+        error: {
+          fetch: null,
+          add: null,
+          reply: null,
+          edit: null,
+          delete: null,
+        },
       };
 
     default:
@@ -89,6 +173,7 @@ export const CommentProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchComments = async () => {
+      dispatch({ type: "FETCH_START" });
       try {
         const response = await axios.get(`${getApiBaseUrl()}/api/comment`);
         dispatch({
@@ -116,7 +201,8 @@ export const CommentProvider = ({ children }) => {
       dispatch({ type: "ADD_COMMENT", payload: response.data });
     } catch (error) {
       console.error("Failed to add comment:", error);
-      dispatch({ type: "ADD_COMMENT_ERROR", payload: "Failed to add comment" });
+      const errorMsg = error.response?.data?.error ?? "Failed to add comment";
+      dispatch({ type: "ADD_COMMENT_ERROR", payload: errorMsg });
     }
   };
 
@@ -134,7 +220,7 @@ export const CommentProvider = ({ children }) => {
       console.error("Failed to add reply:", error);
       dispatch({
         type: "ADD_REPLY_ERROR",
-        payload: error.response.data.error ?? "Failed to add reply",
+        payload: error.response?.data?.error ?? "Failed to add reply",
       });
     }
   };
@@ -145,9 +231,7 @@ export const CommentProvider = ({ children }) => {
     try {
       const response = await axios.put(
         `${getApiBaseUrl()}/api/comment/${commentId}`,
-        {
-          text: newText,
-        }
+        { text: newText }
       );
 
       dispatch({ type: "EDIT_COMMENT_SUCCESS" });
@@ -159,12 +243,16 @@ export const CommentProvider = ({ children }) => {
         newText: updatedComment.text,
         newVotes: newVotes ?? updatedComment.votes,
       });
+
+      return true;
     } catch (error) {
       console.error("Failed to edit comment:", error);
+      const errorMsg = error.response?.data?.error ?? "Failed to edit comment";
       dispatch({
         type: "EDIT_COMMENT_ERROR",
-        payload: "Failed to edit comment",
+        payload: errorMsg,
       });
+      return false;
     }
   };
 
