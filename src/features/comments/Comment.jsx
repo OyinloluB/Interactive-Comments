@@ -44,9 +44,12 @@ const Comment = ({ comment }) => {
     resetError();
   };
 
-  const handleReplySubmit = (newReply) => {
-    handleReplyAdded(comment.id, newReply);
-    setShowReplyForm(false);
+  const handleReplySubmit = async (newReply) => {
+    const success = await handleReplyAdded(comment.id, newReply);
+
+    if (success) {
+      setShowReplyForm(false);
+    }
   };
 
   const handleEditComment = async () => {

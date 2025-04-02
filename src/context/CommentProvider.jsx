@@ -216,12 +216,14 @@ export const CommentProvider = ({ children }) => {
       );
       dispatch({ type: "ADD_REPLY_SUCCESS" });
       dispatch({ type: "ADD_REPLY", parentId, payload: response.data });
+      return true;
     } catch (error) {
       console.error("Failed to add reply:", error);
       dispatch({
         type: "ADD_REPLY_ERROR",
         payload: error.response?.data?.error ?? "Failed to add reply",
       });
+      return false;
     }
   };
 
