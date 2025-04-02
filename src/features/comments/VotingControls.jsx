@@ -4,6 +4,7 @@ import { DownVoteIcon } from "../../components/icons/DownVoteIcon";
 import { useComments } from "../../hooks/useComments";
 import { useState } from "react";
 import axios from "axios";
+import getApiBaseUrl from "../../utils/apiBaseUrl";
 
 const VotingControls = ({ votes, commentId }) => {
   const { handleEditSuccess } = useComments();
@@ -16,7 +17,7 @@ const VotingControls = ({ votes, commentId }) => {
 
     try {
       const response = await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}/${type}`
+        `${getApiBaseUrl()}/api/comment/${commentId}/${type}`
       );
 
       if (response.status === 200) {

@@ -8,6 +8,7 @@ import {
   updateNestedComment,
 } from "../utils/commentUtils";
 import { CommentContext } from "./CommentContext";
+import getApiBaseUrl from "../utils/apiBaseUrl";
 
 const initialState = {
   comments: [],
@@ -89,9 +90,7 @@ export const CommentProvider = ({ children }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/comment`
-        );
+        const response = await axios.get(`${getApiBaseUrl()}/api/comment`);
         dispatch({
           type: "FETCH_SUCCESS",
           payload: organizeComments(response.data),
@@ -110,7 +109,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comment`,
+        `${getApiBaseUrl()}/api/comment`,
         newComment
       );
       dispatch({ type: "ADD_COMMENT_SUCCESS" });
@@ -126,7 +125,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comment`,
+        `${getApiBaseUrl()}/api/comment`,
         newReply
       );
       dispatch({ type: "ADD_REPLY_SUCCESS" });
@@ -145,7 +144,7 @@ export const CommentProvider = ({ children }) => {
 
     try {
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}`,
+        `${getApiBaseUrl()}/api/comment/${commentId}`,
         {
           text: newText,
         }
@@ -173,9 +172,7 @@ export const CommentProvider = ({ children }) => {
     dispatch({ type: "DELETE_COMMENT_START" });
 
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/comment/${commentId}`
-      );
+      await axios.delete(`${getApiBaseUrl()}/api/comment/${commentId}`);
       dispatch({ type: "DELETE_COMMENT_SUCCESS" });
       dispatch({ type: "DELETE_COMMENT", commentId });
     } catch (error) {
