@@ -16,13 +16,13 @@ const DeleteConfirmationModal = ({ isOpen, onConfirm, onCancel }) => {
         <div className="flex justify-between gap-4">
           <button
             onClick={onCancel}
-            className="px-4 py-2 w-full h-[48px] bg-secondary text-white uppercase rounded-md hover:bg-gray-400 cursor-pointer"
+            className="px-4 py-2 w-full h-[48px] bg-secondary text-white text-sm sm:text-base uppercase rounded-md hover:bg-gray-400 cursor-pointer"
           >
             No, Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 w-full bg-danger text-white uppercase rounded-md hover:bg-danger-hover cursor-pointer"
+            className="px-4 py-2 w-full bg-danger text-white text-sm sm:text-base uppercase rounded-md hover:bg-danger-hover cursor-pointer"
           >
             Yes, Delete
           </button>

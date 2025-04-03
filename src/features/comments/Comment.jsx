@@ -77,7 +77,7 @@ const Comment = ({ comment }) => {
 
   return (
     <>
-      <div className={`w-full p-6 rounded-lg bg-comment`}>
+      <div className={`w-full p-4 sm:p-6 rounded-lg bg-comment`}>
         <div className="flex md:flex-row gap-6">
           <div className="hidden md:flex">
             <VotingControls votes={comment.votes} commentId={comment.id} />
@@ -87,10 +87,10 @@ const Comment = ({ comment }) => {
             <div className="flex justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-[32px] h-[32px] rounded-full border border-secondary bg-background" />
-                <p className="text-base font-medium text-primary-text">
+                <p className="text-sm sm:text-base font-medium text-primary-text">
                   {comment.user}
                 </p>
-                <p className="text-base text-secondary">
+                <p className="text-secondary text-sm sm:text-base">
                   {formatDistanceToNow(new Date(comment.createdAt), {
                     addSuffix: true,
                   })}
